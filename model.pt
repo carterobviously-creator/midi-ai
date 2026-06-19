@@ -1,0 +1,273 @@
+[
+  {
+    "keyword": "arcane firebolt",
+    "rbi": 0.91,
+    "description": "A focused bolt of violet fire.",
+    "input_hint": "Short fiery attack, aggressive tone.",
+    "ref_file": "ref_001.txt",
+    "tags": ["fire", "attack", "arcane"],
+    "notes": [
+      { "pitch": 60, "time": 0.0, "length": 0.25 },
+      { "pitch": 64, "time": 0.25, "length": 0.25 },
+      { "pitch": 67, "time": 0.5, "length": 0.35 },
+      { "pitch": 72, "time": 0.9, "length": 0.4 }
+    ]
+  },
+  {
+    "keyword": "frost nova",
+    "rbi": 0.88,
+    "description": "A burst of freezing energy around the caster.",
+    "input_hint": "Cold, defensive, icy explosion.",
+    "ref_file": "ref_002.txt",
+    "tags": ["ice", "defense", "aoe"],
+    "notes": [
+      { "pitch": 67, "time": 0.0, "length": 0.3 },
+      { "pitch": 62, "time": 0.3, "length": 0.3 },
+      { "pitch": 55, "time": 0.6, "length": 0.4 },
+      { "pitch": 62, "time": 1.1, "length": 0.4 }
+    ]
+  },
+  {
+    "keyword": "arcane shield",
+    "rbi": 0.86,
+    "description": "A shimmering barrier of pure mana.",
+    "input_hint": "Protective, calm, stable.",
+    "ref_file": "ref_003.txt",
+    "tags": ["shield", "defense", "arcane"],
+    "notes": [
+      { "pitch": 60, "time": 0.0, "length": 0.4 },
+      { "pitch": 62, "time": 0.4, "length": 0.4 },
+      { "pitch": 65, "time": 0.8, "length": 0.6 }
+    ]
+  },
+  {
+    "keyword": "healing light",
+    "rbi": 0.89,
+    "description": "Soft golden radiance that mends wounds.",
+    "input_hint": "Gentle, uplifting, healing.",
+    "ref_file": "ref_004.txt",
+    "tags": ["healing", "support", "light"],
+    "notes": [
+      { "pitch": 64, "time": 0.0, "length": 0.35 },
+      { "pitch": 67, "time": 0.35, "length": 0.35 },
+      { "pitch": 71, "time": 0.7, "length": 0.5 },
+      { "pitch": 72, "time": 1.3, "length": 0.6 }
+    ]
+  },
+  {
+    "keyword": "shadow step",
+    "rbi": 0.84,
+    "description": "Teleportation through the veil of shadows.",
+    "input_hint": "Stealthy, quick, sneaky.",
+    "ref_file": "ref_005.txt",
+    "tags": ["shadow", "movement", "stealth"],
+    "notes": [
+      { "pitch": 55, "time": 0.0, "length": 0.2 },
+      { "pitch": 58, "time": 0.2, "length": 0.2 },
+      { "pitch": 62, "time": 0.4, "length": 0.25 },
+      { "pitch": 67, "time": 0.7, "length": 0.3 }
+    ]
+  },
+  {
+    "keyword": "thunder strike",
+    "rbi": 0.9,
+    "description": "A single devastating bolt of lightning.",
+    "input_hint": "Loud, sharp, high‑energy.",
+    "ref_file": "ref_006.txt",
+    "tags": ["lightning", "attack", "storm"],
+    "notes": [
+      { "pitch": 72, "time": 0.0, "length": 0.15 },
+      { "pitch": 79, "time": 0.15, "length": 0.2 },
+      { "pitch": 84, "time": 0.4, "length": 0.3 }
+    ]
+  },
+  {
+    "keyword": "earth ward",
+    "rbi": 0.83,
+    "description": "Stone and soil rise to protect the caster.",
+    "input_hint": "Grounded, heavy, slow.",
+    "ref_file": "ref_007.txt",
+    "tags": ["earth", "defense", "ward"],
+    "notes": [
+      { "pitch": 48, "time": 0.0, "length": 0.5 },
+      { "pitch": 52, "time": 0.5, "length": 0.5 },
+      { "pitch": 55, "time": 1.0, "length": 0.6 }
+    ]
+  },
+  {
+    "keyword": "mana surge",
+    "rbi": 0.82,
+    "description": "A surge of raw mana empowering spells.",
+    "input_hint": "Rising, energetic, building.",
+    "ref_file": "ref_008.txt",
+    "tags": ["buff", "mana", "arcane"],
+    "notes": [
+      { "pitch": 60, "time": 0.0, "length": 0.2 },
+      { "pitch": 62, "time": 0.2, "length": 0.2 },
+      { "pitch": 64, "time": 0.4, "length": 0.2 },
+      { "pitch": 67, "time": 0.6, "length": 0.3 },
+      { "pitch": 71, "time": 0.9, "length": 0.4 }
+    ]
+  },
+  {
+    "keyword": "phoenix flame",
+    "rbi": 0.92,
+    "description": "Rebirth through cleansing fire.",
+    "input_hint": "Fire + hopeful, rebirth vibe.",
+    "ref_file": "ref_009.txt",
+    "tags": ["fire", "healing", "rebirth"],
+    "notes": [
+      { "pitch": 60, "time": 0.0, "length": 0.25 },
+      { "pitch": 64, "time": 0.25, "length": 0.25 },
+      { "pitch": 67, "time": 0.5, "length": 0.25 },
+      { "pitch": 72, "time": 0.75, "length": 0.4 },
+      { "pitch": 76, "time": 1.2, "length": 0.5 }
+    ]
+  },
+  {
+    "keyword": "time ripple",
+    "rbi": 0.87,
+    "description": "A subtle distortion in the flow of time.",
+    "input_hint": "Weird, echo‑y, slightly off‑grid.",
+    "ref_file": "ref_010.txt",
+    "tags": ["time", "control", "arcane"],
+    "notes": [
+      { "pitch": 62, "time": 0.0, "length": 0.3 },
+      { "pitch": 62, "time": 0.35, "length": 0.3 },
+      { "pitch": 69, "time": 0.7, "length": 0.4 }
+    ]
+  },
+  {
+    "keyword": "lunar blessing",
+    "rbi": 0.81,
+    "description": "Moonlight that calms and fortifies.",
+    "input_hint": "Soft, slow, night‑time.",
+    "ref_file": "ref_011.txt",
+    "tags": ["moon", "buff", "support"],
+    "notes": [
+      { "pitch": 60, "time": 0.0, "length": 0.4 },
+      { "pitch": 67, "time": 0.4, "length": 0.5 },
+      { "pitch": 72, "time": 1.0, "length": 0.6 }
+    ]
+  },
+  {
+    "keyword": "solar flare",
+    "rbi": 0.9,
+    "description": "Blinding burst of solar fire.",
+    "input_hint": "Bright, fast, high register.",
+    "ref_file": "ref_012.txt",
+    "tags": ["sun", "fire", "light"],
+    "notes": [
+      { "pitch": 76, "time": 0.0, "length": 0.2 },
+      { "pitch": 79, "time": 0.2, "length": 0.2 },
+      { "pitch": 83, "time": 0.4, "length": 0.3 }
+    ]
+  },
+  {
+    "keyword": "gravity well",
+    "rbi": 0.85,
+    "description": "A localized distortion pulling everything inward.",
+    "input_hint": "Heavy, descending motif.",
+    "ref_file": "ref_013.txt",
+    "tags": ["gravity", "control", "space"],
+    "notes": [
+      { "pitch": 64, "time": 0.0, "length": 0.3 },
+      { "pitch": 60, "time": 0.3, "length": 0.3 },
+      { "pitch": 55, "time": 0.6, "length": 0.5 }
+    ]
+  },
+  {
+    "keyword": "spectral chains",
+    "rbi": 0.83,
+    "description": "Ghostly chains that bind the target.",
+    "input_hint": "Spooky, staccato, mid‑range.",
+    "ref_file": "ref_014.txt",
+    "tags": ["spirit", "control", "binding"],
+    "notes": [
+      { "pitch": 60, "time": 0.0, "length": 0.15 },
+      { "pitch": 63, "time": 0.2, "length": 0.15 },
+      { "pitch": 67, "time": 0.4, "length": 0.2 },
+      { "pitch": 63, "time": 0.7, "length": 0.25 }
+    ]
+  },
+  {
+    "keyword": "runic barrier",
+    "rbi": 0.86,
+    "description": "Floating runes form a protective wall.",
+    "input_hint": "Structured, repeating pattern.",
+    "ref_file": "ref_015.txt",
+    "tags": ["runes", "defense", "ward"],
+    "notes": [
+      { "pitch": 60, "time": 0.0, "length": 0.25 },
+      { "pitch": 62, "time": 0.25, "length": 0.25 },
+      { "pitch": 65, "time": 0.5, "length": 0.25 },
+      { "pitch": 62, "time": 0.75, "length": 0.25 }
+    ]
+  },
+  {
+    "keyword": "storm call",
+    "rbi": 0.88,
+    "description": "Summons dark clouds and roaring thunder.",
+    "input_hint": "Rumbling, building, stormy.",
+    "ref_file": "ref_016.txt",
+    "tags": ["storm", "weather", "lightning"],
+    "notes": [
+      { "pitch": 52, "time": 0.0, "length": 0.4 },
+      { "pitch": 55, "time": 0.4, "length": 0.4 },
+      { "pitch": 59, "time": 0.9, "length": 0.5 }
+    ]
+  },
+  {
+    "keyword": "ember spark",
+    "rbi": 0.78,
+    "description": "Small but persistent flame.",
+    "input_hint": "Tiny, flickery, minimal.",
+    "ref_file": "ref_017.txt",
+    "tags": ["fire", "minor", "dot"],
+    "notes": [
+      { "pitch": 72, "time": 0.0, "length": 0.1 },
+      { "pitch": 74, "time": 0.2, "length": 0.1 },
+      { "pitch": 76, "time": 0.4, "length": 0.1 }
+    ]
+  },
+  {
+    "keyword": "tidal wave",
+    "rbi": 0.87,
+    "description": "A massive surge of water crashing forward.",
+    "input_hint": "Swelling, wave‑like motion.",
+    "ref_file": "ref_018.txt",
+    "tags": ["water", "aoe", "wave"],
+    "notes": [
+      { "pitch": 55, "time": 0.0, "length": 0.3 },
+      { "pitch": 59, "time": 0.3, "length": 0.3 },
+      { "pitch": 62, "time": 0.6, "length": 0.4 },
+      { "pitch": 59, "time": 1.1, "length": 0.4 }
+    ]
+  },
+  {
+    "keyword": "verdant growth",
+    "rbi": 0.8,
+    "description": "Plants surge to life in an instant.",
+    "input_hint": "Upward, gentle, nature‑y.",
+    "ref_file": "ref_019.txt",
+    "tags": ["nature", "growth", "support"],
+    "notes": [
+      { "pitch": 57, "time": 0.0, "length": 0.3 },
+      { "pitch": 60, "time": 0.3, "length": 0.3 },
+      { "pitch": 64, "time": 0.6, "length": 0.4 }
+    ]
+  },
+  {
+    "keyword": "astral projection",
+    "rbi": 0.89,
+    "description": "Consciousness travels beyond the body.",
+    "input_hint": "Floaty, high, echo‑y.",
+    "ref_file": "ref_020.txt",
+    "tags": ["astral", "vision", "spirit"],
+    "notes": [
+      { "pitch": 72, "time": 0.0, "length": 0.3 },
+      { "pitch": 76, "time": 0.3, "length": 0.3 },
+      { "pitch": 79, "time": 0.6, "length": 0.5 }
+    ]
+  }
+]
