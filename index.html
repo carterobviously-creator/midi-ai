@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Wizard AI Studio 🧙‍♂️✨</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<style>
+  body {
+    margin: 0;
+    font-family: "Cinzel", serif;
+    background: radial-gradient(circle at center, #1a0f2e, #0a0612 70%);
+    color: #e8d9ff;
+    overflow-x: hidden;
+  }
+
+  /* Floating magical particles */
+  .spark {
+    position: fixed;
+    width: 4px;
+    height: 4px;
+    background: #b084ff;
+    border-radius: 50%;
+    animation: floatUp 6s linear infinite;
+    opacity: 0.7;
+  }
+  @keyframes floatUp {
+    0% { transform: translateY(0) scale(1); opacity: 0.8; }
+    100% { transform: translateY(-120vh) scale(0.2); opacity: 0; }
+  }
+
+  /* Intro screen */
+  #intro {
+    text-align: center;
+    padding: 4rem 1rem;
+    animation: fadeIn 1.5s ease;
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  h1 {
+    font-size: 3rem;
+    text-shadow: 0 0 20px #a46bff;
+  }
+
+  .spellbox {
+    margin: 2rem auto;
+    width: min(600px, 90%);
+    background: rgba(255,255,255,0.05);
+    border: 2px solid rgba(180,130,255,0.3);
+    border-radius: 12px;
+    padding: 1.5rem;
+    backdrop-filter: blur(6px);
+    box-shadow: 0 0 25px rgba(150,80,255,0.3);
+  }
+
+  textarea {
+    width: 100%;
+    height: 120px;
+    background: rgba(0,0,0,0.4);
+    border: 1px solid #5a3b99;
+    color: #e8d9ff;
+    padding: 1rem;
+    border-radius: 8px;
+    font-size: 1.1rem;
+  }
+
+  .cast-btn {
+    margin-top: 1rem;
+    padding: 1rem 2rem;
+    font-size: 1.4rem;
+    border-radius: 999px;
+    border: none;
+    cursor: pointer;
+    background: linear-gradient(90deg, #7b3ff2, #b084ff);
+    color: white;
+    font-weight: bold;
+    box-shadow: 0 0 20px #a46bff;
+    transition: transform 0.15s ease, box-shadow 0.2s ease;
+  }
+  .cast-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 30px #caa0ff;
+  }
+
+  /* Wizard Studio */
+  #studio {
+    display: none;
+    padding: 3rem 1rem;
+    animation: fadeIn 1s ease;
+  }
+
+  .portal {
+    text-align: center;
+    margin-bottom: 2rem;
+    font-size: 2rem;
+    text-shadow: 0 0 15px #b084ff;
+  }
+
+  .result-box {
+    background: rgba(255,255,255,0.05);
+    border: 2px solid rgba(180,130,255,0.3);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin: 1rem auto;
+    width: min(600px, 90%);
+    font-family: monospace;
+    white-space: pre-wrap;
+  }
+
+  audio {
+    width: 100%;
+    margin-top: 1rem;
+  }
+</style>
+</head>
+
+<body>
+
+<!-- Magical floating sparks -->
+<script>
+for (let i = 0; i < 60; i++) {
+  const s = document.createElement("div");
+  s.className = "spark";
+  s.style.left = Math.random()*100 + "vw";
+  s.style.top = Math.random()*100 + "vh";
+  s.style.animationDelay = (Math.random()*6)+"s";
+  document.body.appendChild(s);
+}
+</script>
+
+<!-- INTRO SCREEN -->
+<div id="intro">
+  <h1>Wizard AI Studio 🧙‍♂️✨</h1>
+  <p>Speak your spell. The arcane model shall divine the closest keyword.</p>
+
+  <div class="spellbox">
+    <textarea id="spellInput" placeholder="Type your magical incantation…"></textarea>
+    <button class="cast-btn" onclick="castSpell()">CAST SPELL</button>
+  </div>
+
+  <p id="modelStatus">Loading spellbook (model.pt)…</p>
+</div>
+
+<!-- WIZARD STUDIO -->
+<div id="studio">
+  <div class="portal">✨ You have entered the Wizard Studio ✨</div>
+
+  <div class="result-box" id="resultBox">Awaiting spell results…</div>
+
+  <audio id="midiPlayer" controls></audio>
+</div>
+
+<script>
+let MODEL = [];
+let loaded = false;
+
+async function loadModel() {
+  try {
+    const res = await fetch("model.pt");
+    const txt = await res.text();
+    MODEL = JSON.parse(txt);
+    loaded = true;
+    document.getElementById("modelStatus").textContent =
+      "Spellbook loaded: " + MODEL.length + " runes.";
+  } catch (e) {
+    document.getElementById("modelStatus").textContent =
+      "Failed to load model.pt";
+  }
+}
+loadModel();
+
+function scoreMatch(input, keyword, rbi) {
+  const a = input.toLowerCase().split(/\s+/);
+  const b = keyword.toLowerCase().split(/\s+/);
+  let overlap = 0;
+  for (const t of a) if (b.includes(t)) overlap++;
+  return overlap / Math.max(a.length, b.length) + (rbi || 0) * 0.2;
+}
+
+function castSpell() {
+  if (!loaded) return alert("Spellbook not ready!");
+
+  const text = document.getElementById("spellInput").value.trim();
+  if (!text) return;
+
+  // Portal transition
+  document.getElementById("intro").style.display = "none";
+  document.getElementById("studio").style.display = "block";
+
+  let best = null;
+  let bestScore = -1;
+
+  for (const e of MODEL) {
+    const s = scoreMatch(text, e.keyword, e.rbi);
+    if (s > bestScore) {
+      bestScore = s;
+      best = e;
+    }
+  }
+
+  const box = document.getElementById("resultBox");
+
+  if (!best || bestScore < 0.15) {
+    box.textContent = "No strong rune match.\nWeak score: " + bestScore.toFixed(3);
+    return;
+  }
+
+  box.textContent =
+    "Closest Rune: " + best.keyword +
+    "\nRBI: " + best.rbi +
+    "\nScore: " + bestScore.toFixed(3);
+
+  // If your model entry has a .midi field, play it
+  if (best.midi) {
+    document.getElementById("midiPlayer").src = best.midi;
+  }
+}
+</script>
+
+</body>
+</html>
