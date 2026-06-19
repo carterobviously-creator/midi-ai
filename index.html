@@ -8,13 +8,12 @@
 <style>
   body {
     margin: 0;
-    font-family: "Cinzel", serif;
-    background: radial-gradient(circle at center, #1a0f2e, #0a0612 70%);
+    font-family: "Cinzel", system-ui, serif;
+    background: radial-gradient(circle at center, #1a0f2e, #05030a 70%);
     color: #e8d9ff;
     overflow-x: hidden;
   }
 
-  /* Floating magical particles */
   .spark {
     position: fixed;
     width: 4px;
@@ -23,16 +22,16 @@
     border-radius: 50%;
     animation: floatUp 6s linear infinite;
     opacity: 0.7;
+    pointer-events: none;
   }
   @keyframes floatUp {
     0% { transform: translateY(0) scale(1); opacity: 0.8; }
     100% { transform: translateY(-120vh) scale(0.2); opacity: 0; }
   }
 
-  /* Intro screen */
   #intro {
     text-align: center;
-    padding: 4rem 1rem;
+    padding: 4rem 1rem 3rem;
     animation: fadeIn 1.5s ease;
   }
   @keyframes fadeIn {
@@ -43,10 +42,17 @@
   h1 {
     font-size: 3rem;
     text-shadow: 0 0 20px #a46bff;
+    margin-bottom: 0.5rem;
+  }
+
+  .subtitle {
+    opacity: 0.85;
+    max-width: 600px;
+    margin: 0 auto 2rem;
   }
 
   .spellbox {
-    margin: 2rem auto;
+    margin: 0 auto 1.5rem;
     width: min(600px, 90%);
     background: rgba(255,255,255,0.05);
     border: 2px solid rgba(180,130,255,0.3);
@@ -64,13 +70,14 @@
     color: #e8d9ff;
     padding: 1rem;
     border-radius: 8px;
-    font-size: 1.1rem;
+    font-size: 1.05rem;
+    resize: vertical;
   }
 
   .cast-btn {
     margin-top: 1rem;
-    padding: 1rem 2rem;
-    font-size: 1.4rem;
+    padding: 0.9rem 2.2rem;
+    font-size: 1.3rem;
     border-radius: 999px;
     border: none;
     cursor: pointer;
@@ -85,18 +92,23 @@
     box-shadow: 0 0 30px #caa0ff;
   }
 
-  /* Wizard Studio */
+  #modelStatus {
+    margin-top: 0.5rem;
+    font-size: 0.9rem;
+    opacity: 0.85;
+  }
+
   #studio {
     display: none;
-    padding: 3rem 1rem;
+    padding: 3rem 1rem 4rem;
     animation: fadeIn 1s ease;
+    text-align: center;
   }
 
   .portal {
-    text-align: center;
-    margin-bottom: 2rem;
     font-size: 2rem;
     text-shadow: 0 0 15px #b084ff;
+    margin-bottom: 1.5rem;
   }
 
   .result-box {
@@ -104,22 +116,23 @@
     border: 2px solid rgba(180,130,255,0.3);
     border-radius: 12px;
     padding: 1.5rem;
-    margin: 1rem auto;
-    width: min(600px, 90%);
-    font-family: monospace;
+    margin: 0 auto 1.5rem;
+    width: min(650px, 90%);
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
     white-space: pre-wrap;
+    text-align: left;
   }
 
-  audio {
-    width: 100%;
-    margin-top: 1rem;
+  .hint {
+    font-size: 0.9rem;
+    opacity: 0.85;
+    margin-top: 0.5rem;
   }
 </style>
 </head>
 
 <body>
 
-<!-- Magical floating sparks -->
 <script>
 for (let i = 0; i < 60; i++) {
   const s = document.createElement("div");
@@ -131,91 +144,162 @@ for (let i = 0; i < 60; i++) {
 }
 </script>
 
-<!-- INTRO SCREEN -->
 <div id="intro">
   <h1>Wizard AI Studio 🧙‍♂️✨</h1>
-  <p>Speak your spell. The arcane model shall divine the closest keyword.</p>
+  <p class="subtitle">
+    Type your incantation. The spellbook model will find the closest rune and play its melody.
+  </p>
 
   <div class="spellbox">
-    <textarea id="spellInput" placeholder="Type your magical incantation…"></textarea>
+    <textarea id="spellInput" placeholder="Example: summon a storm of glowing embers over the mountains…"></textarea>
     <button class="cast-btn" onclick="castSpell()">CAST SPELL</button>
+    <p class="hint">The model uses ~keywords + RBI to pick the closest spell.</p>
   </div>
 
   <p id="modelStatus">Loading spellbook (model.pt)…</p>
 </div>
 
-<!-- WIZARD STUDIO -->
 <div id="studio">
   <div class="portal">✨ You have entered the Wizard Studio ✨</div>
-
   <div class="result-box" id="resultBox">Awaiting spell results…</div>
-
-  <audio id="midiPlayer" controls></audio>
+  <p class="hint">If the spell has embedded notes, you’ll hear its melody when it’s chosen.</p>
 </div>
 
 <script>
 let MODEL = [];
-let loaded = false;
+let modelLoaded = false;
+let audioCtx = null;
 
 async function loadModel() {
+  const statusEl = document.getElementById("modelStatus");
   try {
-    const res = await fetch("model.pt");
+    const res = await fetch("model.pt", { cache: "no-store" });
     const txt = await res.text();
     MODEL = JSON.parse(txt);
-    loaded = true;
-    document.getElementById("modelStatus").textContent =
-      "Spellbook loaded: " + MODEL.length + " runes.";
+    if (!Array.isArray(MODEL)) throw new Error("Model is not an array");
+    modelLoaded = true;
+    statusEl.textContent = "Spellbook loaded: " + MODEL.length + " runes.";
   } catch (e) {
-    document.getElementById("modelStatus").textContent =
-      "Failed to load model.pt";
+    console.error(e);
+    statusEl.textContent = "Failed to load model.pt – check file and JSON format.";
   }
 }
 loadModel();
 
 function scoreMatch(input, keyword, rbi) {
-  const a = input.toLowerCase().split(/\s+/);
-  const b = keyword.toLowerCase().split(/\s+/);
+  const a = input.toLowerCase().split(/\s+/).filter(Boolean);
+  const b = keyword.toLowerCase().split(/\s+/).filter(Boolean);
+  if (!a.length || !b.length) return 0;
   let overlap = 0;
   for (const t of a) if (b.includes(t)) overlap++;
-  return overlap / Math.max(a.length, b.length) + (rbi || 0) * 0.2;
+  const base = overlap / Math.max(a.length, b.length);
+  const bonus = typeof rbi === "number" ? rbi * 0.2 : 0;
+  return base + bonus;
 }
 
-function castSpell() {
-  if (!loaded) return alert("Spellbook not ready!");
-
-  const text = document.getElementById("spellInput").value.trim();
-  if (!text) return;
-
-  // Portal transition
-  document.getElementById("intro").style.display = "none";
-  document.getElementById("studio").style.display = "block";
+function findBestMatch(text) {
+  if (!modelLoaded || !MODEL.length) {
+    return { error: "Spellbook not loaded or empty." };
+  }
+  const trimmed = text.trim();
+  if (!trimmed) return { error: "Please enter an incantation first." };
 
   let best = null;
-  let bestScore = -1;
+  let bestScore = -Infinity;
 
-  for (const e of MODEL) {
-    const s = scoreMatch(text, e.keyword, e.rbi);
+  for (const entry of MODEL) {
+    const keyword = entry.keyword || "";
+    const rbi = entry.rbi ?? 0;
+    const s = scoreMatch(trimmed, keyword, rbi);
     if (s > bestScore) {
       bestScore = s;
-      best = e;
+      best = { ...entry, score: s };
     }
   }
 
+  const THRESHOLD = 0.15;
+  if (!best || bestScore < THRESHOLD) return { none: true, bestScore };
+  return best;
+}
+
+function ensureAudioContext() {
+  if (!audioCtx) {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  }
+  if (audioCtx.state === "suspended") {
+    audioCtx.resume();
+  }
+}
+
+function playNotes(noteArray) {
+  if (!noteArray || !noteArray.length) return;
+  ensureAudioContext();
+
+  const startTime = audioCtx.currentTime;
+
+  for (const n of noteArray) {
+    const pitch = typeof n.pitch === "number" ? n.pitch : 60;
+    const time = typeof n.time === "number" ? n.time : 0;
+    const length = typeof n.length === "number" ? n.length : 0.3;
+
+    const freq = 440 * Math.pow(2, (pitch - 69) / 12);
+
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+
+    osc.type = "sine";
+    osc.frequency.value = freq;
+
+    gain.gain.setValueAtTime(0.0, startTime + time);
+    gain.gain.linearRampToValueAtTime(0.4, startTime + time + 0.01);
+    gain.gain.linearRampToValueAtTime(0.0, startTime + time + length);
+
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+
+    osc.start(startTime + time);
+    osc.stop(startTime + time + length + 0.05);
+  }
+}
+
+function castSpell() {
+  const inputEl = document.getElementById("spellInput");
+  const text = inputEl.value;
+  const result = findBestMatch(text);
+
+  document.getElementById("intro").style.display = "none";
+  document.getElementById("studio").style.display = "block";
+
   const box = document.getElementById("resultBox");
 
-  if (!best || bestScore < 0.15) {
-    box.textContent = "No strong rune match.\nWeak score: " + bestScore.toFixed(3);
+  if (result.error) {
+    box.textContent = "⚠ " + result.error;
     return;
   }
 
-  box.textContent =
-    "Closest Rune: " + best.keyword +
-    "\nRBI: " + best.rbi +
-    "\nScore: " + bestScore.toFixed(3);
+  if (result.none) {
+    box.textContent =
+      "No strong rune match.\n" +
+      "Best weak score: " + result.bestScore.toFixed(3);
+    return;
+  }
 
-  // If your model entry has a .midi field, play it
-  if (best.midi) {
-    document.getElementById("midiPlayer").src = best.midi;
+  const lines = [];
+  lines.push("Closest Rune: " + (result.keyword || "(unnamed)"));
+  lines.push("RBI:          " + result.rbi);
+  lines.push("Match score:  " + result.score.toFixed(3));
+  if (result.description) lines.push("");
+  if (result.description) lines.push("Description:  " + result.description);
+  if (result.input_hint) lines.push("Input hint:   " + result.input_hint);
+  if (result.ref_file) lines.push("Ref file:     " + result.ref_file);
+  if (result.tags && result.tags.length) {
+    lines.push("Tags:         " + result.tags.join(", "));
+  }
+
+  box.textContent = lines.join("\n");
+
+  if (result.notes && Array.isArray(result.notes) && result.notes.length) {
+    playNotes(result.notes);
   }
 }
 </script>
