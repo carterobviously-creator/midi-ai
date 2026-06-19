@@ -304,7 +304,7 @@ function hashString(s){
   return Math.abs(h);
 }
 function seedFromPrompt(prompt){
-  const basePitch = 60 + (hashString(prompt) % 12); // C4-ish
+  const basePitch = 60 + (hashString(prompt) % 12);
   const steps = [0,2,4,7,9];
   const notes = [];
   for(let i=0;i<8;i++){
@@ -321,24 +321,30 @@ function seedFromPrompt(prompt){
   };
 }
 
-/* generate sequence with RNN */
+/* FIXED: quantized → generate → unquantized */
 async function generateSequence(prompt, durationSec, temperature){
   if(!rnnReady) throw new Error('Model not ready');
+
   const seed = seedFromPrompt(prompt || 'wizard');
-  const stepsPerSecond = 4; // 16th notes
-  const totalSteps = Math.max(16, Math.floor(durationSec * stepsPerSecond));
-  const continuation = await rnn.continueSequence(
-    seed,
-    totalSteps,
-    temperature
-  );
-  // shift continuation to start at 0
-  const seq = mm.sequences.concatenate([seed, continuation]);
-  // trim to requested duration
-  const maxTime = durationSec;
-  seq.notes = seq.notes.filter(n => n.startTime < maxTime);
-  seq.totalTime = Math.min(seq.totalTime, maxTime);
-  return seq;
+
+  // 1. Quantize seed
+  const qSeed = mm.sequences.quantizeNoteSequence(seed, 4);
+
+  // 2. Generate continuation
+  const totalSteps = Math.max(32, Math.floor(durationSec * 4));
+  const continuation = await rnn.continueSequence(qSeed, totalSteps, temperature);
+
+  // 3. Unquantize
+  const deq = mm.sequences.unquantizeSequence(continuation);
+
+  // 4. Merge seed + continuation
+  const merged = mm.sequences.concatenate([seed, deq]);
+
+  // 5. Trim
+  merged.notes = merged.notes.filter(n => n.startTime < durationSec);
+  merged.totalTime = durationSec;
+
+  return merged;
 }
 
 /* playlist UI */
@@ -442,7 +448,6 @@ document.getElementById('generateBtn').onclick = async () => {
 document.getElementById('playAllBtn').onclick = async () => {
   if(!playlist.length || !player) { log('Playlist empty.'); return; }
   stopAll();
-  // concatenate all sequences
   let offset = 0;
   const merged = {notes:[], totalTime:0};
   playlist.forEach(clip=>{
