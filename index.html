@@ -1,243 +1,488 @@
-<<!DOCTYPE html>
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
-<meta charset="UTF-8">
+<meta charset="utf-8" />
 <title>Wizard Music Studio</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1" />
 <style>
-  body {
-    margin:0;
-    font-family:system-ui;
-    background:#0a0612;
-    color:#f5ecff;
-    display:flex;
-    height:100vh;
+  :root{
+    --bg:#070316;--panel:#0f0b1a;--muted:#bfb6e6;--accent1:#8f5cff;--accent2:#caa8ff;
+    --glass: rgba(255,255,255,0.03);
   }
-  .sidebar {
-    width:220px;
-    background:#05030b;
-    padding:1rem;
-    border-right:1px solid rgba(255,255,255,0.1);
-  }
-  .main {
-    flex:1;
-    padding:1.5rem;
-    display:flex;
-    flex-direction:column;
-    gap:1rem;
-  }
-  textarea, select {
-    width:100%;
-    background:#151028;
-    border:1px solid #3e315f;
-    border-radius:8px;
-    padding:0.7rem;
-    color:#fff;
-  }
-  button {
-    padding:0.6rem 1.2rem;
-    border:none;
-    border-radius:999px;
-    font-weight:600;
-    cursor:pointer;
-  }
-  .btn-primary {
-    background:linear-gradient(90deg,#9b6bff,#c9a8ff);
-    color:#0b0615;
-  }
-  .playlist {
-    flex:1;
-    overflow-y:auto;
-    margin-top:1rem;
-  }
-  .clip {
-    background:#151028;
-    border:1px solid rgba(255,255,255,0.1);
-    padding:0.7rem;
-    border-radius:8px;
-    margin-bottom:0.5rem;
-    display:flex;
-    justify-content:space-between;
-  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial;background:linear-gradient(180deg,#0b0716,#05030a);color:#fff;height:100vh;display:flex}
+  .left{width:260px;padding:20px;border-right:1px solid rgba(255,255,255,0.04);background:linear-gradient(180deg,#0b0716,#060318)}
+  .brand{font-weight:700;font-size:18px;display:flex;align-items:center;gap:10px}
+  .brand .icon{width:36px;height:36px;border-radius:8px;background:linear-gradient(135deg,var(--accent1),var(--accent2));display:inline-block}
+  .left p{color:var(--muted);font-size:13px;margin-top:10px}
+  .main{flex:1;padding:20px;display:flex;flex-direction:column;gap:14px}
+  .top{display:flex;gap:14px}
+  .card{background:var(--panel);border-radius:12px;padding:14px;border:1px solid rgba(255,255,255,0.03);box-shadow:0 6px 30px rgba(0,0,0,0.6)}
+  .create{flex:1;display:flex;flex-direction:column;gap:10px}
+  label{font-size:12px;color:var(--muted);display:block;margin-bottom:6px}
+  textarea,select,input{background:transparent;border:1px solid rgba(255,255,255,0.06);padding:10px;border-radius:8px;color:#fff;min-height:44px}
+  textarea{min-height:120px;resize:vertical}
+  .controls{display:flex;gap:10px;align-items:center}
+  button{cursor:pointer;border-radius:999px;padding:10px 14px;border:none;font-weight:700}
+  .btn-primary{background:linear-gradient(90deg,var(--accent1),var(--accent2));color:#0b0615}
+  .btn-ghost{background:var(--glass);color:#fff;border:1px solid rgba(255,255,255,0.04)}
+  .playlist{width:420px;padding:14px;display:flex;flex-direction:column;gap:10px}
+  .playlist h3{margin:0 0 6px 0}
+  .clip{display:flex;justify-content:space-between;align-items:center;padding:10px;border-radius:10px;background:linear-gradient(180deg,rgba(255,255,255,0.02),transparent);border:1px solid rgba(255,255,255,0.03)}
+  .clip .meta{font-size:13px;color:var(--muted)}
+  .small{font-size:12px;color:var(--muted)}
+  .row{display:flex;gap:8px;align-items:center}
+  .footer{display:flex;justify-content:space-between;align-items:center;padding-top:8px}
+  .log{font-family:monospace;background:rgba(0,0,0,0.35);padding:8px;border-radius:8px;color:var(--muted);max-height:120px;overflow:auto}
+  @media(max-width:980px){.playlist{display:none}.left{display:none}.main{padding:12px}}
 </style>
 </head>
 <body>
+  <aside class="left card">
+    <div class="brand"><span class="icon"></span>wizard studio</div>
+    <p class="small">Local AI‑style MIDI generator. Multitrack export. No external files required.</p>
+    <div style="margin-top:12px">
+      <div class="small">Model: <strong>model.pt</strong></div>
+      <div class="small" id="modelStatus">Loading presets…</div>
+    </div>
+    <div style="margin-top:14px">
+      <div class="small">Quick tips</div>
+      <ul style="padding-left:18px;margin:8px 0;color:var(--muted);font-size:13px">
+        <li>Type a descriptive prompt (e.g., "epic wizard theme").</li>
+        <li>Choose duration (50s–6m). Create → Play → Export .mid</li>
+      </ul>
+    </div>
+  </aside>
 
-<div class="sidebar">
-  <h2>🧙 Wizard Studio</h2>
-  <p>AI MIDI Generator</p>
-</div>
+  <main class="main">
+    <div class="top">
+      <section class="card create">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div>
+            <div style="font-weight:700">Create track</div>
+            <div class="small">Pick a prompt and duration, then create a multitrack clip.</div>
+          </div>
+          <div class="small" id="statusText">Ready</div>
+        </div>
 
-<div class="main">
-  <h2>Create Track</h2>
+        <div>
+          <label for="prompt">Prompt</label>
+          <textarea id="prompt" placeholder="e.g. 'epic wizard theme with drums and choir'"></textarea>
+        </div>
 
-  <textarea id="prompt" placeholder="Describe the music..."></textarea>
+        <div style="display:flex;gap:10px">
+          <div style="flex:1">
+            <label for="duration">Duration</label>
+            <select id="duration">
+              <option value="50">50 seconds</option>
+              <option value="120">2 minutes</option>
+              <option value="180">3 minutes</option>
+              <option value="240">4 minutes</option>
+              <option value="300">5 minutes</option>
+              <option value="360">6 minutes</option>
+            </select>
+          </div>
+          <div style="width:160px">
+            <label for="intensity">Intensity</label>
+            <select id="intensity">
+              <option value="0.8">Calm</option>
+              <option value="1.0" selected>Balanced</option>
+              <option value="1.2">Energetic</option>
+            </select>
+          </div>
+        </div>
 
-  <select id="duration">
-    <option value="50">50 seconds</option>
-    <option value="120">2 minutes</option>
-    <option value="180">3 minutes</option>
-    <option value="240">4 minutes</option>
-    <option value="300">5 minutes</option>
-    <option value="360">6 minutes</option>
-  </select>
+        <div class="controls">
+          <button class="btn-primary" id="createBtn">Create</button>
+          <button class="btn-ghost" id="playAllBtn">Play all</button>
+          <button class="btn-ghost" id="stopBtn">Stop</button>
+          <button class="btn-ghost" id="clearBtn">Clear</button>
+        </div>
 
-  <button class="btn-primary" id="create">Create</button>
+        <div class="footer">
+          <div class="small">Playlist: <span id="clipCount">0</span></div>
+          <div class="small">Export: multi‑track .mid</div>
+        </div>
 
-  <h3>Playlist</h3>
-  <div class="playlist" id="playlist"></div>
-</div>
+        <div style="margin-top:8px" class="log" id="log">Studio ready.</div>
+      </section>
+
+      <aside class="playlist card" id="playlistPanel">
+        <h3>Playlist</h3>
+        <div id="playlist"></div>
+      </aside>
+    </div>
+  </main>
 
 <script>
-// ---------------------------
-// LOAD MODEL
-// ---------------------------
+/* ============================
+   Core: load model.pt presets
+   ============================ */
 let MODEL = [];
-fetch("model.pt")
-  .then(r => r.json())
-  .then(j => MODEL = j);
+let modelLoaded = false;
+fetch('model.pt',{cache:'no-store'})
+  .then(r=>r.json())
+  .then(j=>{
+    MODEL = j;
+    modelLoaded = true;
+    document.getElementById('modelStatus').textContent = MODEL.length + ' presets';
+    log('Loaded ' + MODEL.length + ' presets from model.pt');
+  })
+  .catch(e=>{
+    document.getElementById('modelStatus').textContent = 'Failed to load model.pt';
+    log('Error loading model.pt: ' + e.message);
+  });
 
-// ---------------------------
-// MIDI WRITER (REAL .MID)
-// ---------------------------
-function writeMIDI(tracks) {
-  function varLen(v) {
-    let bytes = [];
-    do {
-      let b = v & 0x7F;
-      v >>= 7;
-      if (v > 0) b |= 0x80;
-      bytes.push(b);
-    } while (v > 0);
-    return bytes;
+/* ============================
+   Utilities
+   ============================ */
+function log(msg){
+  const el = document.getElementById('log');
+  const t = new Date().toLocaleTimeString();
+  el.textContent = `[${t}] ${msg}\n` + el.textContent;
+}
+function clamp(v,a,b){return Math.max(a,Math.min(b,v));}
+
+/* ============================
+   Matching: keyword + RBI
+   ============================ */
+function scoreMatch(prompt, keyword, rbi){
+  const a = prompt.toLowerCase().split(/\s+/).filter(Boolean);
+  const b = keyword.toLowerCase().split(/\s+/).filter(Boolean);
+  if(!a.length || !b.length) return 0;
+  let overlap = 0;
+  for(const w of a) if(b.includes(w)) overlap++;
+  const base = overlap / Math.max(a.length,b.length);
+  return base + (rbi||0)*0.4;
+}
+function findBestPreset(prompt){
+  if(!modelLoaded) return null;
+  const text = (prompt||'').trim();
+  if(!text) return null;
+  let best=null, bestScore=-1;
+  for(const p of MODEL){
+    const s = scoreMatch(text,p.keyword,p.rbi);
+    if(s>bestScore){ bestScore=s; best=p; }
   }
+  if(!best || bestScore < 0.08) return null;
+  return {...best, score:bestScore};
+}
 
-  function noteOn(t, pitch) {
-    return [...varLen(t), 0x90, pitch, 100];
+/* ============================
+   Audio engine (synth drums + instruments)
+   ============================ */
+let audioCtx = null;
+let activeNodes = [];
+function ensureAudio(){
+  if(!audioCtx) audioCtx = new (window.AudioContext||window.webkitAudioContext)();
+  if(audioCtx.state==='suspended') audioCtx.resume();
+}
+function stopAll(){
+  activeNodes.forEach(n=>{
+    try{ n.stop(); }catch(e){}
+  });
+  activeNodes = [];
+}
+
+/* simple instrument voices */
+function playNoteAt(time, pitch, length, type='sine', gainVal=0.35){
+  ensureAudio();
+  const osc = audioCtx.createOscillator();
+  const g = audioCtx.createGain();
+  osc.type = type;
+  osc.frequency.value = 440 * Math.pow(2,(pitch-69)/12);
+  g.gain.setValueAtTime(0, time);
+  g.gain.linearRampToValueAtTime(gainVal, time+0.01);
+  g.gain.linearRampToValueAtTime(0, time+length);
+  osc.connect(g);
+  g.connect(audioCtx.destination);
+  osc.start(time);
+  osc.stop(time+length+0.02);
+  activeNodes.push(osc);
+}
+
+/* drum synth: kick, snare, hihat */
+function playKick(time, length=0.18){
+  ensureAudio();
+  const osc = audioCtx.createOscillator();
+  const g = audioCtx.createGain();
+  osc.type = 'sine';
+  const startFreq = 120;
+  osc.frequency.setValueAtTime(startFreq, time);
+  osc.frequency.exponentialRampToValueAtTime(40, time+length);
+  g.gain.setValueAtTime(0.0001, time);
+  g.gain.exponentialRampToValueAtTime(0.9, time+0.01);
+  g.gain.exponentialRampToValueAtTime(0.0001, time+length);
+  const filter = audioCtx.createBiquadFilter();
+  filter.type = 'lowpass';
+  filter.frequency.setValueAtTime(1200, time);
+  osc.connect(filter);
+  filter.connect(g);
+  g.connect(audioCtx.destination);
+  osc.start(time);
+  osc.stop(time+length+0.02);
+  activeNodes.push(osc);
+}
+function playSnare(time, length=0.12){
+  ensureAudio();
+  const noise = audioCtx.createBufferSource();
+  const buffer = audioCtx.createBuffer(1, audioCtx.sampleRate*length, audioCtx.sampleRate);
+  const data = buffer.getChannelData(0);
+  for(let i=0;i<data.length;i++) data[i] = (Math.random()*2-1)*Math.exp(-i/data.length*6);
+  noise.buffer = buffer;
+  const g = audioCtx.createGain();
+  g.gain.setValueAtTime(0.0001, time);
+  g.gain.linearRampToValueAtTime(0.6, time+0.005);
+  g.gain.exponentialRampToValueAtTime(0.0001, time+length);
+  noise.connect(g);
+  g.connect(audioCtx.destination);
+  noise.start(time);
+  activeNodes.push(noise);
+}
+function playHiHat(time, length=0.06){
+  ensureAudio();
+  const noise = audioCtx.createBufferSource();
+  const buffer = audioCtx.createBuffer(1, audioCtx.sampleRate*length, audioCtx.sampleRate);
+  const data = buffer.getChannelData(0);
+  for(let i=0;i<data.length;i++) data[i] = (Math.random()*2-1)*Math.exp(-i/data.length*10);
+  noise.buffer = buffer;
+  const g = audioCtx.createGain();
+  g.gain.setValueAtTime(0.0001, time);
+  g.gain.linearRampToValueAtTime(0.25, time+0.002);
+  g.gain.exponentialRampToValueAtTime(0.0001, time+length);
+  const filter = audioCtx.createBiquadFilter();
+  filter.type = 'highpass';
+  filter.frequency.setValueAtTime(6000, time);
+  noise.connect(filter);
+  filter.connect(g);
+  g.connect(audioCtx.destination);
+  noise.start(time);
+  activeNodes.push(noise);
+}
+
+/* play a multitrack clip (drums,bass,melody,pad) */
+function playMultitrack(clip){
+  ensureAudio();
+  stopAll();
+  const start = audioCtx.currentTime + 0.05;
+  const intensity = parseFloat(document.getElementById('intensity').value || '1.0');
+  // drums: interpret pitch 36 as kick, 38/40 snare, 42/46 hihat
+  (clip.tracks.drums||[]).forEach(n=>{
+    const t = start + n.time;
+    if([36,35].includes(n.pitch)) playKick(t, n.length*intensity);
+    else if([38,40].includes(n.pitch)) playSnare(t, n.length*intensity);
+    else playHiHat(t, n.length*intensity);
+  });
+  // bass: low sine/triangle
+  (clip.tracks.bass||[]).forEach(n=>{
+    playNoteAt(start + n.time, n.pitch, n.length*intensity, 'triangle', 0.5);
+  });
+  // melody: sawtooth with slight detune
+  (clip.tracks.melody||[]).forEach(n=>{
+    playNoteAt(start + n.time, n.pitch, n.length*intensity, 'sawtooth', 0.35);
+  });
+  // pad: long soft sine
+  (clip.tracks.pad||[]).forEach(n=>{
+    playNoteAt(start + n.time, n.pitch, n.length*intensity, 'sine', 0.25);
+  });
+  log('Playing clip: ' + clip.keyword + ' (' + clip.duration + 's)');
+}
+
+/* ============================
+   MIDI writer (simple multitrack)
+   - ticks per quarter: 480
+   - writes note on/off events per track
+   ============================ */
+function writeVarLen(v){
+  const out=[];
+  let buffer = v & 0x7F;
+  v >>= 7;
+  while(v>0){
+    out.unshift((buffer|0x80));
+    buffer = v & 0x7F;
+    v >>= 7;
   }
-  function noteOff(t, pitch) {
-    return [...varLen(t), 0x80, pitch, 0];
-  }
-
-  let header = [
-    0x4d,0x54,0x68,0x64,
-    0x00,0x00,0x00,0x06,
-    0x00,0x01,
-    0x00,tracks.length,
-    0x01,0xE0
-  ];
-
-  let chunks = [];
-
-  tracks.forEach((track, i) => {
-    let data = [];
-    track.forEach(n => {
-      let start = Math.floor(n.time * 480);
-      let end = Math.floor((n.time + n.length) * 480);
-      data.push(...noteOn(start, n.pitch));
-      data.push(...noteOff(end - start, n.pitch));
+  out.unshift(buffer);
+  return out;
+}
+function writeMIDI(tracks){
+  // header: MThd, format 1, ntrks, division 480
+  const header = [0x4d,0x54,0x68,0x64,0,0,0,6,0,1,0,tracks.length,0x01,0xE0];
+  const chunks = [];
+  tracks.forEach(track=>{
+    const events = [];
+    // convert times to ticks (480 ticks per second assumed for simplicity)
+    track.forEach(n=>{
+      const startTick = Math.round(n.time * 480);
+      const durTick = Math.round(n.length * 480);
+      // note on
+      events.push({dt:startTick, type:'on', pitch:n.pitch, vel:100});
+      // note off
+      events.push({dt:startTick+durTick, type:'off', pitch:n.pitch, vel:0});
     });
+    // sort by dt
+    events.sort((a,b)=>a.dt-b.dt);
+    // write events with delta times
+    let last = 0;
+    const data = [];
+    events.forEach(ev=>{
+      const delta = ev.dt - last;
+      last = ev.dt;
+      data.push(...writeVarLen(delta));
+      if(ev.type==='on') data.push(0x90, ev.pitch & 0x7F, ev.vel & 0x7F);
+      else data.push(0x80, ev.pitch & 0x7F, ev.vel & 0x7F);
+    });
+    // end of track
     data.push(0x00,0xFF,0x2F,0x00);
-    let len = data.length;
-    chunks.push([
-      0x4d,0x54,0x72,0x6b,
-      (len>>24)&255,(len>>16)&255,(len>>8)&255,len&255,
-      ...data
-    ]);
+    const len = data.length;
+    const chunk = [0x4d,0x54,0x72,0x6b, (len>>24)&255,(len>>16)&255,(len>>8)&255,len&255, ...data];
+    chunks.push(chunk);
   });
-
-  return new Uint8Array([...header, ...chunks.flat()]);
+  // flatten
+  const all = new Uint8Array([...header, ...chunks.flat()]);
+  return all;
 }
 
-// ---------------------------
-// AUDIO PLAYBACK
-// ---------------------------
-let audioCtx = new (window.AudioContext||window.webkitAudioContext)();
+/* ============================
+   Stretch notes to target duration
+   ============================ */
+function stretchTracks(tracks, baseDuration, targetDuration){
+  if(!baseDuration || baseDuration<=0) return tracks;
+  const scale = targetDuration / baseDuration;
+  const out = {};
+  for(const k of Object.keys(tracks)){
+    out[k] = (tracks[k]||[]).map(n=>({pitch:n.pitch, time:n.time*scale, length:n.length*scale}));
+  }
+  return out;
+}
 
-function playTrack(track) {
-  let start = audioCtx.currentTime;
-  track.forEach(n => {
-    let osc = audioCtx.createOscillator();
-    let g = audioCtx.createGain();
-    osc.frequency.value = 440 * Math.pow(2,(n.pitch-69)/12);
-    osc.type = "triangle";
-    osc.connect(g);
-    g.connect(audioCtx.destination);
-    osc.start(start + n.time);
-    osc.stop(start + n.time + n.length);
+/* ============================
+   Playlist management & UI
+   ============================ */
+let playlist = [];
+function addClipToPlaylist(clip){
+  playlist.push(clip);
+  renderPlaylist();
+}
+function renderPlaylist(){
+  const el = document.getElementById('playlist');
+  el.innerHTML = '';
+  document.getElementById('clipCount').textContent = playlist.length;
+  playlist.forEach((clip, idx)=>{
+    const div = document.createElement('div');
+    div.className = 'clip';
+    const left = document.createElement('div');
+    left.innerHTML = `<div style="font-weight:700">${clip.keyword}</div><div class="meta">${clip.duration}s · score ${clip.score.toFixed(3)}</div>`;
+    const right = document.createElement('div');
+    right.className = 'row';
+    const playBtn = document.createElement('button'); playBtn.className='btn-ghost'; playBtn.textContent='Play'; playBtn.onclick=()=>playMultitrack(clip);
+    const exportBtn = document.createElement('button'); exportBtn.className='btn-ghost'; exportBtn.textContent='Export .mid'; exportBtn.onclick=()=>exportClip(clip);
+    const delBtn = document.createElement('button'); delBtn.className='btn-ghost'; delBtn.textContent='Delete'; delBtn.onclick=()=>{ playlist.splice(idx,1); renderPlaylist(); };
+    right.appendChild(playBtn); right.appendChild(exportBtn); right.appendChild(delBtn);
+    div.appendChild(left); div.appendChild(right);
+    el.appendChild(div);
   });
 }
 
-// ---------------------------
-// FIND BEST PRESET
-// ---------------------------
-function matchPreset(prompt) {
-  let words = prompt.toLowerCase().split(/\s+/);
-  let best = null, bestScore = -1;
-  MODEL.forEach(p => {
-    let score = 0;
-    words.forEach(w => {
-      if (p.keyword.toLowerCase().includes(w)) score += 1;
-    });
-    score += p.rbi * 0.5;
-    if (score > bestScore) { bestScore = score; best = p; }
-  });
-  return best;
-}
-
-// ---------------------------
-// CREATE CLIP
-// ---------------------------
-document.getElementById("create").onclick = () => {
-  let prompt = document.getElementById("prompt").value;
-  let dur = parseInt(document.getElementById("duration").value);
-
-  let preset = matchPreset(prompt);
-  if (!preset) return alert("No matching preset!");
-
-  // stretch tracks
-  let scale = dur / preset.duration;
-  let drums = preset.tracks.drums.map(n => ({...n, time:n.time*scale, length:n.length*scale}));
-  let bass  = preset.tracks.bass.map(n => ({...n, time:n.time*scale, length:n.length*scale}));
-  let mel   = preset.tracks.melody.map(n => ({...n, time:n.time*scale, length:n.length*scale}));
-  let pad   = preset.tracks.pad.map(n => ({...n, time:n.time*scale, length:n.length*scale}));
-
-  let clip = { preset:preset.keyword, duration:dur, drums, bass, mel, pad };
-
-  let div = document.createElement("div");
-  div.className = "clip";
-  div.innerHTML = `
-    <div>
-      <b>${preset.keyword}</b><br>
-      ${dur}s
-    </div>
-    <div>
-      <button onclick='playTrack(${JSON.stringify(drums)})'>Drums</button>
-      <button onclick='playTrack(${JSON.stringify(bass)})'>Bass</button>
-      <button onclick='playTrack(${JSON.stringify(mel)})'>Melody</button>
-      <button onclick='playTrack(${JSON.stringify(pad)})'>Pad</button>
-      <button onclick='exportMIDI(${JSON.stringify(clip)})'>Export</button>
-    </div>
-  `;
-  document.getElementById("playlist").appendChild(div);
-};
-
-// ---------------------------
-// EXPORT MIDI
-// ---------------------------
-function exportMIDI(clip) {
-  let midi = writeMIDI([
-    clip.drums,
-    clip.bass,
-    clip.mel,
-    clip.pad
-  ]);
-  let blob = new Blob([midi], {type:"audio/midi"});
-  let a = document.createElement("a");
+/* ============================
+   Export clip to .mid
+   ============================ */
+function exportClip(clip){
+  // build tracks array in order: drums,bass,melody,pad
+  const tracks = [
+    (clip.tracks.drums||[]).map(n=>({pitch:n.pitch,time:n.time,length:n.length})),
+    (clip.tracks.bass||[]).map(n=>({pitch:n.pitch,time:n.time,length:n.length})),
+    (clip.tracks.melody||[]).map(n=>({pitch:n.pitch,time:n.time,length:n.length})),
+    (clip.tracks.pad||[]).map(n=>({pitch:n.pitch,time:n.time,length:n.length}))
+  ];
+  const midi = writeMIDI(tracks);
+  const blob = new Blob([midi], {type:'audio/midi'});
+  const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
-  a.download = clip.preset.replace(/\s+/g,"_") + ".mid";
+  a.download = (clip.keyword.replace(/\s+/g,'_') || 'clip') + '.mid';
   a.click();
+  log('Exported .mid: ' + a.download);
 }
+
+/* ============================
+   Create flow
+   ============================ */
+document.getElementById('createBtn').addEventListener('click', ()=>{
+  const prompt = document.getElementById('prompt').value || '';
+  const duration = parseInt(document.getElementById('duration').value,10) || 60;
+  const preset = findBestPreset(prompt);
+  if(!preset){
+    document.getElementById('statusText').textContent = 'No strong preset match — using fallback';
+    log('No strong preset match; using fallback generator.');
+    // fallback: generate simple 4-track pattern from prompt hash
+    const fallback = generateFallback(prompt,duration);
+    addClipToPlaylist(fallback);
+    return;
+  }
+  const stretched = stretchTracks(preset.tracks || {}, preset.duration || 60, duration);
+  const clip = {
+    id: Date.now(),
+    keyword: preset.keyword,
+    rbi: preset.rbi,
+    score: preset.score,
+    duration: duration,
+    tracks: stretched
+  };
+  addClipToPlaylist(clip);
+  log('Created clip from preset: ' + preset.keyword + ' (' + duration + 's)');
+  document.getElementById('statusText').textContent = 'Created: ' + preset.keyword;
+});
+
+/* fallback generator: deterministic from prompt */
+function generateFallback(prompt, duration){
+  const base = 60 + (hash(prompt) % 12);
+  const steps = [0,3,7,10];
+  const beats = Math.floor(duration * 2);
+  const drums = [];
+  for(let i=0;i<beats;i++){
+    if(i%2===0) drums.push({pitch:36,time:i*0.5,length:0.08});
+    if(i%4===2) drums.push({pitch:38,time:i*0.5,length:0.06});
+    if(i%1===0 && Math.random()>0.7) drums.push({pitch:42,time:i*0.5+0.25,length:0.04});
+  }
+  const bass = [];
+  for(let i=0;i<Math.floor(beats/2);i++) bass.push({pitch:base-12,time:i*1.0,length:0.9});
+  const melody = [];
+  for(let i=0;i<Math.floor(beats/3);i++) melody.push({pitch:base + steps[i%steps.length],time:i*1.2,length:0.6});
+  const pad = [{pitch:base-7,time:0,length:Math.max(8,duration)}];
+  return {id:Date.now(),keyword:'fallback',rbi:0.5,score:0.5,duration,tracks:{drums,bass,melody,pad}};
+}
+function hash(s){ let h=0; for(let i=0;i<s.length;i++) h=(h*31 + s.charCodeAt(i))|0; return Math.abs(h); }
+
+/* ============================
+   Play all / stop / clear
+   ============================ */
+document.getElementById('playAllBtn').addEventListener('click', ()=>{
+  if(!playlist.length){ log('Playlist empty'); return; }
+  // play sequentially
+  ensureAudio();
+  stopAll();
+  let offset = audioCtx.currentTime + 0.05;
+  playlist.forEach(clip=>{
+    // schedule each clip's notes at offset
+    // we will create a temporary clip with shifted times
+    const shifted = {tracks:{}};
+    for(const k of Object.keys(clip.tracks)){
+      shifted.tracks[k] = (clip.tracks[k]||[]).map(n=>({pitch:n.pitch,time:n.time + (offset - audioCtx.currentTime),length:n.length}));
+    }
+    // play shifted clip immediately (it will start at offset)
+    playMultitrack({keyword:clip.keyword,duration:clip.duration,tracks:shifted.tracks});
+    offset += clip.duration;
+  });
+  log('Playing all clips in sequence.');
+});
+document.getElementById('stopBtn').addEventListener('click', ()=>{ stopAll(); log('Stopped playback.'); });
+document.getElementById('clearBtn').addEventListener('click', ()=>{ playlist=[]; renderPlaylist(); log('Cleared playlist.'); });
+
+/* ============================
+   Initial UI state
+   ============================ */
+renderPlaylist();
+log('Wizard Studio ready.');
 </script>
 </body>
 </html>
