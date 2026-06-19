@@ -2,368 +2,346 @@
 <html lang="en">
 <head>
 <meta charset="utf-8" />
-<title>Wizard Music Studio</title>
+<title>Wizard MIDI Studio</title>
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <style>
   :root{
-    --bg:#070316;--panel:#0f0b1a;--muted:#bfb6e6;--accent1:#8f5cff;--accent2:#caa8ff;
-    --glass: rgba(255,255,255,0.03);
+    --bg:#f4f4f7;
+    --panel:#ffffff;
+    --border:#dcdce5;
+    --accent:#3b82f6;
+    --accent-soft:#e0edff;
+    --text:#111827;
+    --muted:#6b7280;
   }
-  *{box-sizing:border-box}
-  body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial;background:linear-gradient(180deg,#0b0716,#05030a);color:#fff;height:100vh;display:flex}
-  .left{width:260px;padding:20px;border-right:1px solid rgba(255,255,255,0.04);background:linear-gradient(180deg,#0b0716,#060318)}
-  .brand{font-weight:700;font-size:18px;display:flex;align-items:center;gap:10px}
-  .brand .icon{width:36px;height:36px;border-radius:8px;background:linear-gradient(135deg,var(--accent1),var(--accent2));display:inline-block}
-  .left p{color:var(--muted);font-size:13px;margin-top:10px}
-  .main{flex:1;padding:20px;display:flex;flex-direction:column;gap:14px}
-  .top{display:flex;gap:14px}
-  .card{background:var(--panel);border-radius:12px;padding:14px;border:1px solid rgba(255,255,255,0.03);box-shadow:0 6px 30px rgba(0,0,0,0.6)}
-  .create{flex:1;display:flex;flex-direction:column;gap:10px}
-  label{font-size:12px;color:var(--muted);display:block;margin-bottom:6px}
-  textarea,select,input{background:transparent;border:1px solid rgba(255,255,255,0.06);padding:10px;border-radius:8px;color:#fff;min-height:44px}
-  textarea{min-height:120px;resize:vertical}
-  .controls{display:flex;gap:10px;align-items:center}
-  button{cursor:pointer;border-radius:999px;padding:10px 14px;border:none;font-weight:700}
-  .btn-primary{background:linear-gradient(90deg,var(--accent1),var(--accent2));color:#0b0615}
-  .btn-ghost{background:var(--glass);color:#fff;border:1px solid rgba(255,255,255,0.04)}
-  .playlist{width:420px;padding:14px;display:flex;flex-direction:column;gap:10px}
-  .playlist h3{margin:0 0 6px 0}
-  .clip{display:flex;justify-content:space-between;align-items:center;padding:10px;border-radius:10px;background:linear-gradient(180deg,rgba(255,255,255,0.02),transparent);border:1px solid rgba(255,255,255,0.03)}
-  .clip .meta{font-size:13px;color:var(--muted)}
-  .small{font-size:12px;color:var(--muted)}
-  .row{display:flex;gap:8px;align-items:center}
-  .footer{display:flex;justify-content:space-between;align-items:center;padding-top:8px}
-  .log{font-family:monospace;background:rgba(0,0,0,0.35);padding:8px;border-radius:8px;color:var(--muted);max-height:120px;overflow:auto}
-  @media(max-width:980px){.playlist{display:none}.left{display:none}.main{padding:12px}}
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;
+    background:var(--bg);
+    color:var(--text);
+  }
+  .shell{
+    max-width:1100px;
+    margin:24px auto;
+    padding:0 16px 32px;
+  }
+  header{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    gap:16px;
+    margin-bottom:20px;
+  }
+  .title-block h1{
+    margin:0;
+    font-size:24px;
+    font-weight:700;
+  }
+  .title-block p{
+    margin:4px 0 0;
+    color:var(--muted);
+    font-size:14px;
+  }
+  .badge{
+    padding:4px 10px;
+    border-radius:999px;
+    border:1px solid var(--border);
+    background:#fff;
+    font-size:12px;
+    color:var(--muted);
+  }
+  .layout{
+    display:flex;
+    gap:16px;
+    align-items:flex-start;
+  }
+  .card{
+    background:var(--panel);
+    border-radius:12px;
+    border:1px solid var(--border);
+    padding:16px;
+    box-shadow:0 10px 30px rgba(15,23,42,0.06);
+  }
+  .create-card{
+    flex:1.4;
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+  }
+  .playlist-card{
+    flex:1;
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+    max-height:520px;
+  }
+  .card-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:4px;
+  }
+  .card-title{
+    font-weight:600;
+    font-size:15px;
+  }
+  .card-sub{
+    font-size:13px;
+    color:var(--muted);
+  }
+  label{
+    font-size:13px;
+    color:var(--muted);
+    display:block;
+    margin-bottom:4px;
+  }
+  textarea,select{
+    width:100%;
+    border-radius:8px;
+    border:1px solid var(--border);
+    padding:8px 10px;
+    font-size:14px;
+    font-family:inherit;
+    resize:vertical;
+  }
+  textarea:focus,select:focus{
+    outline:none;
+    border-color:var(--accent);
+    box-shadow:0 0 0 1px var(--accent-soft);
+  }
+  textarea{min-height:110px;}
+  .row{
+    display:flex;
+    gap:10px;
+    align-items:flex-start;
+  }
+  .grow{flex:1;}
+  button{
+    border:none;
+    border-radius:999px;
+    padding:8px 14px;
+    font-size:13px;
+    font-weight:600;
+    cursor:pointer;
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+  }
+  .btn-primary{
+    background:var(--accent);
+    color:#fff;
+  }
+  .btn-secondary{
+    background:#fff;
+    color:var(--text);
+    border:1px solid var(--border);
+  }
+  .btn-primary:hover{filter:brightness(1.05);}
+  .btn-secondary:hover{background:#f9fafb;}
+  .small{
+    font-size:12px;
+    color:var(--muted);
+  }
+  .log{
+    font-family:ui-monospace,Menlo,Consolas,monospace;
+    font-size:11px;
+    background:#f9fafb;
+    border-radius:8px;
+    padding:8px;
+    border:1px solid var(--border);
+    max-height:110px;
+    overflow:auto;
+  }
+  .playlist-list{
+    flex:1;
+    overflow:auto;
+    margin-top:4px;
+  }
+  .clip{
+    border-radius:8px;
+    border:1px solid var(--border);
+    padding:8px 10px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:6px;
+    background:#fff;
+  }
+  .clip-main{
+    max-width:60%;
+  }
+  .clip-title{
+    font-size:13px;
+    font-weight:600;
+  }
+  .clip-meta{
+    font-size:12px;
+    color:var(--muted);
+  }
+  .clip-actions{
+    display:flex;
+    gap:6px;
+    flex-wrap:wrap;
+  }
+  @media(max-width:900px){
+    .layout{flex-direction:column;}
+  }
 </style>
 </head>
 <body>
-  <aside class="left card">
-    <div class="brand"><span class="icon"></span>wizard studio</div>
-    <p class="small">Local AI‑style MIDI generator. Multitrack export. No external files required.</p>
-    <div style="margin-top:12px">
-      <div class="small">Model: <strong>model.pt</strong></div>
-      <div class="small" id="modelStatus">Loading presets…</div>
+<div class="shell">
+  <header>
+    <div class="title-block">
+      <h1>Wizard MIDI Studio</h1>
+      <p>Text → multitrack MIDI using Magenta.js. Clean UI, real export.</p>
     </div>
-    <div style="margin-top:14px">
-      <div class="small">Quick tips</div>
-      <ul style="padding-left:18px;margin:8px 0;color:var(--muted);font-size:13px">
-        <li>Type a descriptive prompt (e.g., "epic wizard theme").</li>
-        <li>Choose duration (50s–6m). Create → Play → Export .mid</li>
-      </ul>
-    </div>
-  </aside>
+    <div class="badge" id="modelStatus">Loading Magenta model…</div>
+  </header>
 
-  <main class="main">
-    <div class="top">
-      <section class="card create">
-        <div style="display:flex;justify-content:space-between;align-items:center">
-          <div>
-            <div style="font-weight:700">Create track</div>
-            <div class="small">Pick a prompt and duration, then create a multitrack clip.</div>
-          </div>
-          <div class="small" id="statusText">Ready</div>
-        </div>
-
+  <div class="layout">
+    <section class="card create-card">
+      <div class="card-header">
         <div>
-          <label for="prompt">Prompt</label>
-          <textarea id="prompt" placeholder="e.g. 'epic wizard theme with drums and choir'"></textarea>
+          <div class="card-title">Create track</div>
+          <div class="card-sub">Describe the vibe, choose duration, generate.</div>
         </div>
+        <div class="small" id="statusText">Ready</div>
+      </div>
 
-        <div style="display:flex;gap:10px">
-          <div style="flex:1">
-            <label for="duration">Duration</label>
-            <select id="duration">
-              <option value="50">50 seconds</option>
-              <option value="120">2 minutes</option>
-              <option value="180">3 minutes</option>
-              <option value="240">4 minutes</option>
-              <option value="300">5 minutes</option>
-              <option value="360">6 minutes</option>
-            </select>
-          </div>
-          <div style="width:160px">
-            <label for="intensity">Intensity</label>
-            <select id="intensity">
-              <option value="0.8">Calm</option>
-              <option value="1.0" selected>Balanced</option>
-              <option value="1.2">Energetic</option>
-            </select>
-          </div>
+      <div>
+        <label for="prompt">Prompt</label>
+        <textarea id="prompt" placeholder="e.g. epic wizard theme with drums and soaring melody"></textarea>
+      </div>
+
+      <div class="row">
+        <div class="grow">
+          <label for="duration">Duration</label>
+          <select id="duration">
+            <option value="50">50 seconds</option>
+            <option value="120">2 minutes</option>
+            <option value="180">3 minutes</option>
+            <option value="240">4 minutes</option>
+            <option value="300">5 minutes</option>
+            <option value="360">6 minutes</option>
+          </select>
         </div>
-
-        <div class="controls">
-          <button class="btn-primary" id="createBtn">Create</button>
-          <button class="btn-ghost" id="playAllBtn">Play all</button>
-          <button class="btn-ghost" id="stopBtn">Stop</button>
-          <button class="btn-ghost" id="clearBtn">Clear</button>
+        <div class="grow">
+          <label for="temperature">Variation</label>
+          <select id="temperature">
+            <option value="0.8">Stable</option>
+            <option value="1.0" selected>Balanced</option>
+            <option value="1.3">Wild</option>
+          </select>
         </div>
+      </div>
 
-        <div class="footer">
-          <div class="small">Playlist: <span id="clipCount">0</span></div>
-          <div class="small">Export: multi‑track .mid</div>
+      <div class="row" style="margin-top:8px;">
+        <button class="btn-primary" id="generateBtn">Generate</button>
+        <button class="btn-secondary" id="playAllBtn">Play all</button>
+        <button class="btn-secondary" id="stopBtn">Stop</button>
+        <button class="btn-secondary" id="clearBtn">Clear</button>
+      </div>
+
+      <div class="row" style="justify-content:space-between;margin-top:4px;">
+        <div class="small">Playlist: <span id="clipCount">0</span></div>
+        <div class="small">Export: standard .mid (Magenta sequence)</div>
+      </div>
+
+      <div class="log" id="log">Studio ready.</div>
+    </section>
+
+    <section class="card playlist-card">
+      <div class="card-header">
+        <div>
+          <div class="card-title">Playlist</div>
+          <div class="card-sub">Each clip is a generated MIDI sequence.</div>
         </div>
+      </div>
+      <div class="playlist-list" id="playlist"></div>
+    </section>
+  </div>
+</div>
 
-        <div style="margin-top:8px" class="log" id="log">Studio ready.</div>
-      </section>
-
-      <aside class="playlist card" id="playlistPanel">
-        <h3>Playlist</h3>
-        <div id="playlist"></div>
-      </aside>
-    </div>
-  </main>
-
+<!-- Magenta.js -->
+<script src="https://unpkg.com/@magenta/music@1.23.1"></script>
 <script>
-/* ============================
-   Core: load model.pt presets
-   ============================ */
-let MODEL = [];
-let modelLoaded = false;
-fetch('model.pt',{cache:'no-store'})
-  .then(r=>r.json())
-  .then(j=>{
-    MODEL = j;
-    modelLoaded = true;
-    document.getElementById('modelStatus').textContent = MODEL.length + ' presets';
-    log('Loaded ' + MODEL.length + ' presets from model.pt');
-  })
-  .catch(e=>{
-    document.getElementById('modelStatus').textContent = 'Failed to load model.pt';
-    log('Error loading model.pt: ' + e.message);
-  });
-
-/* ============================
-   Utilities
-   ============================ */
-function log(msg){
-  const el = document.getElementById('log');
-  const t = new Date().toLocaleTimeString();
-  el.textContent = `[${t}] ${msg}\n` + el.textContent;
-}
-function clamp(v,a,b){return Math.max(a,Math.min(b,v));}
-
-/* ============================
-   Matching: keyword + RBI
-   ============================ */
-function scoreMatch(prompt, keyword, rbi){
-  const a = prompt.toLowerCase().split(/\s+/).filter(Boolean);
-  const b = keyword.toLowerCase().split(/\s+/).filter(Boolean);
-  if(!a.length || !b.length) return 0;
-  let overlap = 0;
-  for(const w of a) if(b.includes(w)) overlap++;
-  const base = overlap / Math.max(a.length,b.length);
-  return base + (rbi||0)*0.4;
-}
-function findBestPreset(prompt){
-  if(!modelLoaded) return null;
-  const text = (prompt||'').trim();
-  if(!text) return null;
-  let best=null, bestScore=-1;
-  for(const p of MODEL){
-    const s = scoreMatch(text,p.keyword,p.rbi);
-    if(s>bestScore){ bestScore=s; best=p; }
-  }
-  if(!best || bestScore < 0.08) return null;
-  return {...best, score:bestScore};
-}
-
-/* ============================
-   Audio engine (synth drums + instruments)
-   ============================ */
-let audioCtx = null;
-let activeNodes = [];
-function ensureAudio(){
-  if(!audioCtx) audioCtx = new (window.AudioContext||window.webkitAudioContext)();
-  if(audioCtx.state==='suspended') audioCtx.resume();
-}
-function stopAll(){
-  activeNodes.forEach(n=>{
-    try{ n.stop(); }catch(e){}
-  });
-  activeNodes = [];
-}
-
-/* simple instrument voices */
-function playNoteAt(time, pitch, length, type='sine', gainVal=0.35){
-  ensureAudio();
-  const osc = audioCtx.createOscillator();
-  const g = audioCtx.createGain();
-  osc.type = type;
-  osc.frequency.value = 440 * Math.pow(2,(pitch-69)/12);
-  g.gain.setValueAtTime(0, time);
-  g.gain.linearRampToValueAtTime(gainVal, time+0.01);
-  g.gain.linearRampToValueAtTime(0, time+length);
-  osc.connect(g);
-  g.connect(audioCtx.destination);
-  osc.start(time);
-  osc.stop(time+length+0.02);
-  activeNodes.push(osc);
-}
-
-/* drum synth: kick, snare, hihat */
-function playKick(time, length=0.18){
-  ensureAudio();
-  const osc = audioCtx.createOscillator();
-  const g = audioCtx.createGain();
-  osc.type = 'sine';
-  const startFreq = 120;
-  osc.frequency.setValueAtTime(startFreq, time);
-  osc.frequency.exponentialRampToValueAtTime(40, time+length);
-  g.gain.setValueAtTime(0.0001, time);
-  g.gain.exponentialRampToValueAtTime(0.9, time+0.01);
-  g.gain.exponentialRampToValueAtTime(0.0001, time+length);
-  const filter = audioCtx.createBiquadFilter();
-  filter.type = 'lowpass';
-  filter.frequency.setValueAtTime(1200, time);
-  osc.connect(filter);
-  filter.connect(g);
-  g.connect(audioCtx.destination);
-  osc.start(time);
-  osc.stop(time+length+0.02);
-  activeNodes.push(osc);
-}
-function playSnare(time, length=0.12){
-  ensureAudio();
-  const noise = audioCtx.createBufferSource();
-  const buffer = audioCtx.createBuffer(1, audioCtx.sampleRate*length, audioCtx.sampleRate);
-  const data = buffer.getChannelData(0);
-  for(let i=0;i<data.length;i++) data[i] = (Math.random()*2-1)*Math.exp(-i/data.length*6);
-  noise.buffer = buffer;
-  const g = audioCtx.createGain();
-  g.gain.setValueAtTime(0.0001, time);
-  g.gain.linearRampToValueAtTime(0.6, time+0.005);
-  g.gain.exponentialRampToValueAtTime(0.0001, time+length);
-  noise.connect(g);
-  g.connect(audioCtx.destination);
-  noise.start(time);
-  activeNodes.push(noise);
-}
-function playHiHat(time, length=0.06){
-  ensureAudio();
-  const noise = audioCtx.createBufferSource();
-  const buffer = audioCtx.createBuffer(1, audioCtx.sampleRate*length, audioCtx.sampleRate);
-  const data = buffer.getChannelData(0);
-  for(let i=0;i<data.length;i++) data[i] = (Math.random()*2-1)*Math.exp(-i/data.length*10);
-  noise.buffer = buffer;
-  const g = audioCtx.createGain();
-  g.gain.setValueAtTime(0.0001, time);
-  g.gain.linearRampToValueAtTime(0.25, time+0.002);
-  g.gain.exponentialRampToValueAtTime(0.0001, time+length);
-  const filter = audioCtx.createBiquadFilter();
-  filter.type = 'highpass';
-  filter.frequency.setValueAtTime(6000, time);
-  noise.connect(filter);
-  filter.connect(g);
-  g.connect(audioCtx.destination);
-  noise.start(time);
-  activeNodes.push(noise);
-}
-
-/* play a multitrack clip (drums,bass,melody,pad) */
-function playMultitrack(clip){
-  ensureAudio();
-  stopAll();
-  const start = audioCtx.currentTime + 0.05;
-  const intensity = parseFloat(document.getElementById('intensity').value || '1.0');
-  // drums: interpret pitch 36 as kick, 38/40 snare, 42/46 hihat
-  (clip.tracks.drums||[]).forEach(n=>{
-    const t = start + n.time;
-    if([36,35].includes(n.pitch)) playKick(t, n.length*intensity);
-    else if([38,40].includes(n.pitch)) playSnare(t, n.length*intensity);
-    else playHiHat(t, n.length*intensity);
-  });
-  // bass: low sine/triangle
-  (clip.tracks.bass||[]).forEach(n=>{
-    playNoteAt(start + n.time, n.pitch, n.length*intensity, 'triangle', 0.5);
-  });
-  // melody: sawtooth with slight detune
-  (clip.tracks.melody||[]).forEach(n=>{
-    playNoteAt(start + n.time, n.pitch, n.length*intensity, 'sawtooth', 0.35);
-  });
-  // pad: long soft sine
-  (clip.tracks.pad||[]).forEach(n=>{
-    playNoteAt(start + n.time, n.pitch, n.length*intensity, 'sine', 0.25);
-  });
-  log('Playing clip: ' + clip.keyword + ' (' + clip.duration + 's)');
-}
-
-/* ============================
-   MIDI writer (simple multitrack)
-   - ticks per quarter: 480
-   - writes note on/off events per track
-   ============================ */
-function writeVarLen(v){
-  const out=[];
-  let buffer = v & 0x7F;
-  v >>= 7;
-  while(v>0){
-    out.unshift((buffer|0x80));
-    buffer = v & 0x7F;
-    v >>= 7;
-  }
-  out.unshift(buffer);
-  return out;
-}
-function writeMIDI(tracks){
-  // header: MThd, format 1, ntrks, division 480
-  const header = [0x4d,0x54,0x68,0x64,0,0,0,6,0,1,0,tracks.length,0x01,0xE0];
-  const chunks = [];
-  tracks.forEach(track=>{
-    const events = [];
-    // convert times to ticks (480 ticks per second assumed for simplicity)
-    track.forEach(n=>{
-      const startTick = Math.round(n.time * 480);
-      const durTick = Math.round(n.length * 480);
-      // note on
-      events.push({dt:startTick, type:'on', pitch:n.pitch, vel:100});
-      // note off
-      events.push({dt:startTick+durTick, type:'off', pitch:n.pitch, vel:0});
-    });
-    // sort by dt
-    events.sort((a,b)=>a.dt-b.dt);
-    // write events with delta times
-    let last = 0;
-    const data = [];
-    events.forEach(ev=>{
-      const delta = ev.dt - last;
-      last = ev.dt;
-      data.push(...writeVarLen(delta));
-      if(ev.type==='on') data.push(0x90, ev.pitch & 0x7F, ev.vel & 0x7F);
-      else data.push(0x80, ev.pitch & 0x7F, ev.vel & 0x7F);
-    });
-    // end of track
-    data.push(0x00,0xFF,0x2F,0x00);
-    const len = data.length;
-    const chunk = [0x4d,0x54,0x72,0x6b, (len>>24)&255,(len>>16)&255,(len>>8)&255,len&255, ...data];
-    chunks.push(chunk);
-  });
-  // flatten
-  const all = new Uint8Array([...header, ...chunks.flat()]);
-  return all;
-}
-
-/* ============================
-   Stretch notes to target duration
-   ============================ */
-function stretchTracks(tracks, baseDuration, targetDuration){
-  if(!baseDuration || baseDuration<=0) return tracks;
-  const scale = targetDuration / baseDuration;
-  const out = {};
-  for(const k of Object.keys(tracks)){
-    out[k] = (tracks[k]||[]).map(n=>({pitch:n.pitch, time:n.time*scale, length:n.length*scale}));
-  }
-  return out;
-}
-
-/* ============================
-   Playlist management & UI
-   ============================ */
+let rnn;
+let rnnReady = false;
+let player;
 let playlist = [];
-function addClipToPlaylist(clip){
-  playlist.push(clip);
-  renderPlaylist();
+
+const modelStatusEl = document.getElementById('modelStatus');
+const statusTextEl = document.getElementById('statusText');
+const logEl = document.getElementById('log');
+
+function log(msg){
+  const t = new Date().toLocaleTimeString();
+  logEl.textContent = `[${t}] ${msg}\n` + logEl.textContent;
 }
+
+async function initMagenta(){
+  try{
+    rnn = new mm.MusicRNN(
+      'https://storage.googleapis.com/magentadata/js/checkpoints/music_rnn/basic_rnn'
+    );
+    await rnn.initialize();
+    player = new mm.Player();
+    rnnReady = true;
+    modelStatusEl.textContent = 'Model: basic_rnn loaded';
+    log('Magenta MusicRNN loaded.');
+  }catch(e){
+    modelStatusEl.textContent = 'Failed to load model';
+    log('Error loading Magenta model: ' + e.message);
+  }
+}
+initMagenta();
+
+/* prompt → deterministic seed melody */
+function hashString(s){
+  let h = 0;
+  for(let i=0;i<s.length;i++) h = (h*31 + s.charCodeAt(i)) | 0;
+  return Math.abs(h);
+}
+function seedFromPrompt(prompt){
+  const basePitch = 60 + (hashString(prompt) % 12); // C4-ish
+  const steps = [0,2,4,7,9];
+  const notes = [];
+  for(let i=0;i<8;i++){
+    const step = steps[(hashString(prompt + i) + i) % steps.length];
+    notes.push({
+      pitch: basePitch + step,
+      startTime: i * 0.5,
+      endTime: i * 0.5 + 0.45
+    });
+  }
+  return {
+    notes,
+    totalTime: notes[notes.length-1].endTime
+  };
+}
+
+/* generate sequence with RNN */
+async function generateSequence(prompt, durationSec, temperature){
+  if(!rnnReady) throw new Error('Model not ready');
+  const seed = seedFromPrompt(prompt || 'wizard');
+  const stepsPerSecond = 4; // 16th notes
+  const totalSteps = Math.max(16, Math.floor(durationSec * stepsPerSecond));
+  const continuation = await rnn.continueSequence(
+    seed,
+    totalSteps,
+    temperature
+  );
+  // shift continuation to start at 0
+  const seq = mm.sequences.concatenate([seed, continuation]);
+  // trim to requested duration
+  const maxTime = durationSec;
+  seq.notes = seq.notes.filter(n => n.startTime < maxTime);
+  seq.totalTime = Math.min(seq.totalTime, maxTime);
+  return seq;
+}
+
+/* playlist UI */
 function renderPlaylist(){
   const el = document.getElementById('playlist');
   el.innerHTML = '';
@@ -371,118 +349,132 @@ function renderPlaylist(){
   playlist.forEach((clip, idx)=>{
     const div = document.createElement('div');
     div.className = 'clip';
-    const left = document.createElement('div');
-    left.innerHTML = `<div style="font-weight:700">${clip.keyword}</div><div class="meta">${clip.duration}s · score ${clip.score.toFixed(3)}</div>`;
-    const right = document.createElement('div');
-    right.className = 'row';
-    const playBtn = document.createElement('button'); playBtn.className='btn-ghost'; playBtn.textContent='Play'; playBtn.onclick=()=>playMultitrack(clip);
-    const exportBtn = document.createElement('button'); exportBtn.className='btn-ghost'; exportBtn.textContent='Export .mid'; exportBtn.onclick=()=>exportClip(clip);
-    const delBtn = document.createElement('button'); delBtn.className='btn-ghost'; delBtn.textContent='Delete'; delBtn.onclick=()=>{ playlist.splice(idx,1); renderPlaylist(); };
-    right.appendChild(playBtn); right.appendChild(exportBtn); right.appendChild(delBtn);
-    div.appendChild(left); div.appendChild(right);
+    const main = document.createElement('div');
+    main.className = 'clip-main';
+    main.innerHTML = `
+      <div class="clip-title">${clip.label}</div>
+      <div class="clip-meta">${clip.duration}s · ${clip.notesCount} notes</div>
+    `;
+    const actions = document.createElement('div');
+    actions.className = 'clip-actions';
+
+    const playBtn = document.createElement('button');
+    playBtn.className = 'btn-secondary';
+    playBtn.textContent = 'Play';
+    playBtn.onclick = () => playClip(clip);
+
+    const exportBtn = document.createElement('button');
+    exportBtn.className = 'btn-secondary';
+    exportBtn.textContent = 'Export .mid';
+    exportBtn.onclick = () => exportClip(clip);
+
+    const delBtn = document.createElement('button');
+    delBtn.className = 'btn-secondary';
+    delBtn.textContent = '✕';
+    delBtn.onclick = () => { playlist.splice(idx,1); renderPlaylist(); };
+
+    actions.appendChild(playBtn);
+    actions.appendChild(exportBtn);
+    actions.appendChild(delBtn);
+
+    div.appendChild(main);
+    div.appendChild(actions);
     el.appendChild(div);
   });
 }
 
-/* ============================
-   Export clip to .mid
-   ============================ */
+/* playback */
+function stopAll(){
+  if(player) player.stop();
+}
+function playClip(clip){
+  if(!player) return;
+  stopAll();
+  player.start(clip.sequence);
+  log('Playing: ' + clip.label);
+}
+
+/* export */
 function exportClip(clip){
-  // build tracks array in order: drums,bass,melody,pad
-  const tracks = [
-    (clip.tracks.drums||[]).map(n=>({pitch:n.pitch,time:n.time,length:n.length})),
-    (clip.tracks.bass||[]).map(n=>({pitch:n.pitch,time:n.time,length:n.length})),
-    (clip.tracks.melody||[]).map(n=>({pitch:n.pitch,time:n.time,length:n.length})),
-    (clip.tracks.pad||[]).map(n=>({pitch:n.pitch,time:n.time,length:n.length}))
-  ];
-  const midi = writeMIDI(tracks);
-  const blob = new Blob([midi], {type:'audio/midi'});
+  const bytes = mm.sequenceProtoToMidi(clip.sequence);
+  const blob = new Blob([bytes], {type:'audio/midi'});
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
-  a.download = (clip.keyword.replace(/\s+/g,'_') || 'clip') + '.mid';
+  a.download = clip.label.replace(/\s+/g,'_') + '.mid';
   a.click();
   log('Exported .mid: ' + a.download);
 }
 
-/* ============================
-   Create flow
-   ============================ */
-document.getElementById('createBtn').addEventListener('click', ()=>{
-  const prompt = document.getElementById('prompt').value || '';
+/* generate button */
+document.getElementById('generateBtn').onclick = async () => {
+  const prompt = document.getElementById('prompt').value || 'wizard theme';
   const duration = parseInt(document.getElementById('duration').value,10) || 60;
-  const preset = findBestPreset(prompt);
-  if(!preset){
-    document.getElementById('statusText').textContent = 'No strong preset match — using fallback';
-    log('No strong preset match; using fallback generator.');
-    // fallback: generate simple 4-track pattern from prompt hash
-    const fallback = generateFallback(prompt,duration);
-    addClipToPlaylist(fallback);
+  const temperature = parseFloat(document.getElementById('temperature').value || '1.0');
+
+  if(!rnnReady){
+    statusTextEl.textContent = 'Model not ready yet';
+    log('Model not ready yet.');
     return;
   }
-  const stretched = stretchTracks(preset.tracks || {}, preset.duration || 60, duration);
-  const clip = {
-    id: Date.now(),
-    keyword: preset.keyword,
-    rbi: preset.rbi,
-    score: preset.score,
-    duration: duration,
-    tracks: stretched
-  };
-  addClipToPlaylist(clip);
-  log('Created clip from preset: ' + preset.keyword + ' (' + duration + 's)');
-  document.getElementById('statusText').textContent = 'Created: ' + preset.keyword;
-});
 
-/* fallback generator: deterministic from prompt */
-function generateFallback(prompt, duration){
-  const base = 60 + (hash(prompt) % 12);
-  const steps = [0,3,7,10];
-  const beats = Math.floor(duration * 2);
-  const drums = [];
-  for(let i=0;i<beats;i++){
-    if(i%2===0) drums.push({pitch:36,time:i*0.5,length:0.08});
-    if(i%4===2) drums.push({pitch:38,time:i*0.5,length:0.06});
-    if(i%1===0 && Math.random()>0.7) drums.push({pitch:42,time:i*0.5+0.25,length:0.04});
+  statusTextEl.textContent = 'Generating…';
+  log('Generating sequence for "'+prompt+'" ('+duration+'s)…');
+
+  try{
+    const seq = await generateSequence(prompt, duration, temperature);
+    const clip = {
+      label: prompt.trim() || 'untitled',
+      duration: duration,
+      notesCount: seq.notes.length,
+      sequence: seq
+    };
+    playlist.push(clip);
+    renderPlaylist();
+    statusTextEl.textContent = 'Generated';
+    log('Generated clip: '+clip.label+' with '+clip.notesCount+' notes.');
+  }catch(e){
+    statusTextEl.textContent = 'Error';
+    log('Generation error: ' + e.message);
   }
-  const bass = [];
-  for(let i=0;i<Math.floor(beats/2);i++) bass.push({pitch:base-12,time:i*1.0,length:0.9});
-  const melody = [];
-  for(let i=0;i<Math.floor(beats/3);i++) melody.push({pitch:base + steps[i%steps.length],time:i*1.2,length:0.6});
-  const pad = [{pitch:base-7,time:0,length:Math.max(8,duration)}];
-  return {id:Date.now(),keyword:'fallback',rbi:0.5,score:0.5,duration,tracks:{drums,bass,melody,pad}};
-}
-function hash(s){ let h=0; for(let i=0;i<s.length;i++) h=(h*31 + s.charCodeAt(i))|0; return Math.abs(h); }
+};
 
-/* ============================
-   Play all / stop / clear
-   ============================ */
-document.getElementById('playAllBtn').addEventListener('click', ()=>{
-  if(!playlist.length){ log('Playlist empty'); return; }
-  // play sequentially
-  ensureAudio();
+/* play all */
+document.getElementById('playAllBtn').onclick = async () => {
+  if(!playlist.length || !player) { log('Playlist empty.'); return; }
   stopAll();
-  let offset = audioCtx.currentTime + 0.05;
+  // concatenate all sequences
+  let offset = 0;
+  const merged = {notes:[], totalTime:0};
   playlist.forEach(clip=>{
-    // schedule each clip's notes at offset
-    // we will create a temporary clip with shifted times
-    const shifted = {tracks:{}};
-    for(const k of Object.keys(clip.tracks)){
-      shifted.tracks[k] = (clip.tracks[k]||[]).map(n=>({pitch:n.pitch,time:n.time + (offset - audioCtx.currentTime),length:n.length}));
-    }
-    // play shifted clip immediately (it will start at offset)
-    playMultitrack({keyword:clip.keyword,duration:clip.duration,tracks:shifted.tracks});
-    offset += clip.duration;
+    clip.sequence.notes.forEach(n=>{
+      merged.notes.push({
+        pitch:n.pitch,
+        startTime:n.startTime + offset,
+        endTime:n.endTime + offset,
+        velocity:n.velocity
+      });
+    });
+    offset += clip.sequence.totalTime;
   });
+  merged.totalTime = offset;
+  player.start(merged);
   log('Playing all clips in sequence.');
-});
-document.getElementById('stopBtn').addEventListener('click', ()=>{ stopAll(); log('Stopped playback.'); });
-document.getElementById('clearBtn').addEventListener('click', ()=>{ playlist=[]; renderPlaylist(); log('Cleared playlist.'); });
+};
 
-/* ============================
-   Initial UI state
-   ============================ */
+/* stop / clear */
+document.getElementById('stopBtn').onclick = () => {
+  stopAll();
+  log('Stopped playback.');
+};
+document.getElementById('clearBtn').onclick = () => {
+  stopAll();
+  playlist = [];
+  renderPlaylist();
+  log('Cleared playlist.');
+};
+
+/* init */
 renderPlaylist();
-log('Wizard Studio ready.');
 </script>
 </body>
 </html>
